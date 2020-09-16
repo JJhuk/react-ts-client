@@ -7,6 +7,8 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
+import {config} from "./config";
+import {Link} from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -17,6 +19,10 @@ const useStyles = makeStyles((theme: Theme) =>
             margin: `${theme.spacing(0)} auto`
         },
         loginBtn: {
+            marginTop: theme.spacing(2),
+            flexGrow: 1
+        },
+        registerBtn: {
             marginTop: theme.spacing(2),
             flexGrow: 1
         },
@@ -112,18 +118,62 @@ const Login = () => {
     }, [state.username, state.password]);
 
     const handleLogin = () => {
-        if (state.username === 'abc@email.com' && state.password === 'password') {
-            dispatch({
-                type: 'loginSuccess',
-                payload: 'Login Successfully'
-            });
-        } else {
-            dispatch({
-                type: 'loginFailed',
-                payload: 'Incorrect username or password'
-            });
+        const username = state.username;
+        const password = state.password;
+
+        console.log(username + "@@"+ password)
+
+        const requestOptions = {
+            method : 'POST',
+            headers : {
+                'Content-Type' : 'application/json',
+                'Access-Control-Allow-Origin' : 'http://localhost:3001'
+            },
+            body: JSON.stringify({username,password})
         }
+
+        return fetch(config.apiUrl + '/users/authenticate', requestOptions)
+            .then(handleResponse,handleError)
+            .then(user => {
+                if(user && user.token) {
+                    localStorage.setItem('user',JSON.stringify(user))
+                }
+                return user})
     };
+
+     const handleRegister = () => {
+
+    }
+
+    function handleError(error:  any  ) {
+        console.log('handle error : ' + error);
+
+        return Promise.reject(error & error.message);
+    }
+
+    function handleResponse(response : any) : Promise<{ token : string }> {
+        return new Promise(((resolve, reject) => {
+            if(response.ok) {
+                dispatch({
+                    type: 'loginSuccess',
+                    payload: 'Login Successfully'
+                });
+                let contentType = response.headers.get("content-type");
+                if(contentType && contentType.includes("application/json")) {
+                    response.json().then((json: { token : string }) => resolve(json))
+                } else {
+                    resolve()
+                }
+
+            } else {
+                response.text().then((text: any) => reject(text))
+                dispatch({
+                    type: 'loginFailed',
+                    payload: 'Login failed'
+                });
+            }
+        }))
+    }
 
     const handleKeyPress = (event: React.KeyboardEvent) => {
         if (event.keyCode === 13 || event.which === 13) {
@@ -178,15 +228,29 @@ const Login = () => {
                     </div>
                 </CardContent>
                 <CardActions>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        color="secondary"
-                        className={classes.loginBtn}
-                        onClick={handleLogin}
-                        disabled={state.isButtonDisabled}>
-                        Login
-                    </Button>
+                    <div>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            color="secondary"
+                            className={classes.loginBtn}
+                            onClick={handleLogin}
+                            disabled={state.isButtonDisabled}>
+                            Login
+                        </Button>
+                    </div>
+                    <div>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            color="secondary"
+                            className={classes.registerBtn}
+                            onClick={handleRegister}
+                            disabled={false}>
+                            Register
+                        </Button>
+                        <Link to="/register"/>
+                    </div>
                 </CardActions>
             </Card>
         </form>
