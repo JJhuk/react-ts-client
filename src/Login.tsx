@@ -9,6 +9,7 @@ import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
 import {config} from "./config";
 import {Link} from "react-router-dom";
+import {history} from "./history";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -139,6 +140,10 @@ const Login = () => {
                     localStorage.setItem('user',JSON.stringify(user))
                 }
                 return user})
+            .then(user => {
+                //Todo 다시 그려지지가 않음.
+                history.push('#/home/')
+            })
     };
 
      const handleRegister = () => {
@@ -154,19 +159,23 @@ const Login = () => {
     function handleResponse(response : any) : Promise<{ token : string }> {
         return new Promise(((resolve, reject) => {
             if(response.ok) {
+                console.log('success')
                 dispatch({
                     type: 'loginSuccess',
                     payload: 'Login Successfully'
                 });
-                let contentType = response.headers.get("content-type");
-                if(contentType && contentType.includes("application/json")) {
-                    response.json().then((json: { token : string }) => resolve(json))
+                if(response.ok) {
+                    let contentType = response.headers.get("content-type");
+                    if(contentType && contentType.includes("application/json")) {
+                        response.json().then((json: { token : string }) => resolve(json))
+                    } else {
+                        resolve()
+                    }
                 } else {
-                    resolve()
+                    response.text().then((text: any) => reject(text))
                 }
-
             } else {
-                response.text().then((text: any) => reject(text))
+                console.log('failed')
                 dispatch({
                     type: 'loginFailed',
                     payload: 'Login failed'
@@ -240,16 +249,17 @@ const Login = () => {
                         </Button>
                     </div>
                     <div>
-                        <Button
-                            variant="contained"
-                            size="large"
-                            color="secondary"
-                            className={classes.registerBtn}
-                            onClick={handleRegister}
-                            disabled={false}>
-                            Register
-                        </Button>
-                        <Link to="/register"/>
+                        <Link to="/register">
+                            <Button
+                                variant="contained"
+                                size="large"
+                                color="secondary"
+                                className={classes.registerBtn}
+                                onClick={handleRegister}
+                                disabled={false}>
+                                Register
+                            </Button>
+                        </Link>
                     </div>
                 </CardActions>
             </Card>

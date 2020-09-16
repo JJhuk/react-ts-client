@@ -7,6 +7,8 @@ import CardContent from "@material-ui/core/CardContent";
 import TextField from "@material-ui/core/TextField";
 import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
+import {Link} from "react-router-dom";
+import {history} from "./history";
 
 const serverURL = 'http://localhost:5000';
 
@@ -27,6 +29,10 @@ const styles = (theme: Theme) =>(
             marginTop: theme.spacing(2),
             flexGrow: 1
         },
+        homeBtn: {
+            marginTop: theme.spacing(2),
+            flexGrow: 1
+        },
         header: {
             textAlign: 'center',
             background: '#212121',
@@ -38,11 +44,28 @@ const styles = (theme: Theme) =>(
     })
 );
 
-interface Props extends WithStyles<typeof styles>{
-
+function handleResponse(response : any) : Promise<{token : string}> {
+    return new Promise(((resolve, reject) => {
+        if(response.ok) {
+            let contentType = response.headers.get("content-type");
+            if(contentType && contentType.includes("application/json")) {
+                response.json().then(json => resolve(json))
+            } else{
+                resolve()
+            }
+        } else {
+            console.log('not ok')
+            response.text().then((text:any) => reject(text))
+        }
+    }))
 }
 
-class Register extends React.Component<Props,{user}> {
+function handleError({error}: { error: any } ) {
+    console.log(error)
+    return Promise.reject(error & error.message);
+}
+
+class Register extends React.Component<WithStyles<typeof styles>,{user}> {
 
     constructor(props : any) {
         super(props);
@@ -104,7 +127,8 @@ class Register extends React.Component<Props,{user}> {
             body: JSON.stringify(user)
         };
         console.log(serverURL + '/users/register' + requestOptions);
-        fetch(serverURL + '/users/register', requestOptions);
+        fetch(serverURL + '/users/register', requestOptions)
+            .then(handleResponse,handleError)
     }
 
 
@@ -146,15 +170,25 @@ class Register extends React.Component<Props,{user}> {
                         </div>
                     </CardContent>
                     <CardActions>
-                        <Button
-                            variant="contained"
-                            size="large"
-                            color="secondary"
-                            className={classes.registerBtn}
-                            onClick={this.register}
-                            disabled={false}>
-                            Register
-                        </Button>
+                            <Button
+                                variant="contained"
+                                size="large"
+                                color="secondary"
+                                className={classes.registerBtn}
+                                onClick={this.register}
+                                disabled={false}>
+                                Register
+                            </Button>
+                            <Link to="/">
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    color="secondary"
+                                    className={classes.homeBtn}
+                                    disabled={false}>
+                                    Home
+                                </Button>
+                            </Link>
                     </CardActions>
                 </Card>
             </form>
