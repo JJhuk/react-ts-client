@@ -1,5 +1,5 @@
-import React, { useReducer, useEffect } from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import React, {useReducer, useEffect} from 'react';
+import {createStyles, makeStyles, Theme} from '@material-ui/core/styles';
 
 import TextField from '@material-ui/core/TextField';
 import Card from '@material-ui/core/Card';
@@ -42,13 +42,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type State = {
     username: string
-    password:  string
+    password: string
     isButtonDisabled: boolean
     helperText: string
     isError: boolean
 };
 
-const initialState:State = {
+const initialState: State = {
     username: '',
     password: '',
     isButtonDisabled: true,
@@ -122,64 +122,61 @@ const Login = () => {
         const username = state.username;
         const password = state.password;
 
-        console.log(username + "@@"+ password)
+        console.log(username + "@@" + password)
 
         const requestOptions = {
-            method : 'POST',
-            headers : {
-                'Content-Type' : 'application/json',
-                'Access-Control-Allow-Origin' : 'http://localhost:3001'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({username,password})
+            body: JSON.stringify({username, password})
         }
 
         return fetch(config.apiUrl + '/users/authenticate', requestOptions)
-            .then(handleResponse,handleError)
+            .then(handleResponse, handleError)
             .then(user => {
-                if(user && user.token) {
-                    localStorage.setItem('user',JSON.stringify(user))
+                if (user && user.token) {
+                    localStorage.setItem('user', JSON.stringify(user))
+                    console.log('set Item!!')
                 }
-                return user})
-            .then(user => {
-                //Todo 다시 그려지지가 않음.
-                history.push('#/home/')
+                return user
+            })
+            .then(() => {
+                history.push('/home')
             })
     };
 
-     const handleRegister = () => {
+    const handleRegister = () => {
 
     }
 
-    function handleError(error:  any  ) {
+    function handleError(error: any) {
         console.log('handle error : ' + error);
 
         return Promise.reject(error & error.message);
     }
 
-    function handleResponse(response : any) : Promise<{ token : string }> {
+    function handleResponse(response: any): Promise<{ token: string }> {
         return new Promise(((resolve, reject) => {
-            if(response.ok) {
+            if (response.ok) {
                 console.log('success')
                 dispatch({
                     type: 'loginSuccess',
                     payload: 'Login Successfully'
                 });
-                if(response.ok) {
-                    let contentType = response.headers.get("content-type");
-                    if(contentType && contentType.includes("application/json")) {
-                        response.json().then((json: { token : string }) => resolve(json))
-                    } else {
-                        resolve()
-                    }
+                let contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    response.json().then((json: { token: string }) => resolve(json))
                 } else {
-                    response.text().then((text: any) => reject(text))
+                    resolve()
                 }
             } else {
+                response.text().then((text: any) => reject(text))
                 console.log('failed')
                 dispatch({
                     type: 'loginFailed',
                     payload: 'Login failed'
-                });
+                })
             }
         }))
     }
@@ -208,7 +205,7 @@ const Login = () => {
     return (
         <form className={classes.container} noValidate autoComplete="off">
             <Card className={classes.card}>
-                <CardHeader className={classes.header} title="Login App" />
+                <CardHeader className={classes.header} title="Login App"/>
                 <CardContent>
                     <div>
                         <TextField

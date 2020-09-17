@@ -8,7 +8,6 @@ import TextField from "@material-ui/core/TextField";
 import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
 import {Link} from "react-router-dom";
-import {history} from "./history";
 
 const serverURL = 'http://localhost:5000';
 
