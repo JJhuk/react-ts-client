@@ -2,6 +2,7 @@ import React from "react";
 import {authHeader} from "./auth-header";
 import {config} from "./config";
 import {history} from "./history";
+import WeatherInfo from "./weatherInfo";
 
 type user = {
     token?: string,
@@ -74,6 +75,7 @@ export default class Home extends React.Component<any, any> {
             <div>
                 <h1 className="user-username">Hi! {userName}</h1>
                 <h4 className="user-email">Your Email is {email}</h4>
+                <h2 className={"weatherInfo"}><WeatherInfo/></h2>
                 <button onClick={this.handleGoHome} className={"user-homeBtn"}>Go to Home</button>
                 <button onClick={this.handleLogout} className={"user-logoutBtn"}>Logout</button>
             </div>
