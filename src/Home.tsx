@@ -4,13 +4,6 @@ import {config} from "./config";
 import {history} from "./history";
 import WeatherInfo from "./weatherInfo";
 
-type user = {
-    token?: string,
-    userName?: string,
-    email?: string,
-}
-
-
 export default class Home extends React.Component<any, any> {
     constructor(props) {
         super(props);
@@ -21,42 +14,22 @@ export default class Home extends React.Component<any, any> {
             userID: JSON.parse(localStorage.getItem('user') as string).id,
         }
 
-        this.fetchData()
+        this.fetchData().catch(console.log)
         this.handleLogout = this.handleLogout.bind(this)
     }
 
-    fetchData() {
-
+    async fetchData() {
         console.log('function fetchData() called ')
-        const requestOptions = {
+        const response = await fetch(`${config.apiUrl}/users/${this.state.userID}`, {
             method: 'GET',
             headers: authHeader(),
-        }
-        fetch(config.apiUrl + '/users/' + this.state.userID, requestOptions)
-            .then(this.handleResponse, this.handleError)
-            .then(user => {
-                this.setState({userName: user.userName, email: user.email, userID: this.state.userID})
-            });
+        })
+        console.log(response)
+        if (!response.ok)
+            throw await response.text()
 
-    }
-
-    handleResponse(response: any): Promise<user> {
-        return new Promise(((resolve, reject) => {
-            if (response.ok) {
-                let contentType = response.headers.get("content-type");
-                if (contentType && contentType.includes("application/json")) {
-                    response.json().then((json: { token: string }) => resolve(json))
-                } else {
-                    resolve()
-                }
-            } else {
-                response.text().then((text: any) => reject(text))
-            }
-        }))
-    }
-
-    handleError({error}: { error: any }) {
-        return Promise.reject(error & error.message);
+        const user = await response.json()
+        this.setState({...user, userID: this.state.userID})
     }
 
     handleGoHome() {

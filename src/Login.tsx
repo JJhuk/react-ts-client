@@ -63,6 +63,7 @@ type Action = { type: 'setUsername', payload: string }
     | { type: 'loginFailed', payload: string }
     | { type: 'setIsError', payload: boolean };
 
+
 const reducer = (state: State, action: Action): State => {
     switch (action.type) {
         case 'setUsername':
@@ -118,68 +119,39 @@ const Login = () => {
         }
     }, [state.username, state.password]);
 
-    const handleLogin = () => {
-        const username = state.username;
-        const password = state.password;
+    const handleLogin = async () => {
+        const {username, password} = state;
+        const res = await fetch(config.apiUrl + '/users/authenticate',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({username, password})
+            })
 
-        console.log(username + "@@" + password)
-
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({username, password})
+        if (!res.ok) {
+            dispatch({
+                type: 'loginFailed',
+                payload: 'Login failed'
+            })
+            throw await res.text()
         }
-
-        return fetch(config.apiUrl + '/users/authenticate', requestOptions)
-            .then(handleResponse, handleError)
-            .then(user => {
-                if (user && user.token) {
-                    localStorage.setItem('user', JSON.stringify(user))
-                    console.log('set Item!!')
-                }
-                return user
-            })
-            .then(() => {
-                history.push('/home')
-            })
+        dispatch({
+            type: 'loginSuccess',
+            payload: 'Login Successfully'
+        })
+        const resJson = await res.json()
+        console.log('res success'+resJson)
+        localStorage.setItem('user', JSON.stringify(resJson))
+        history.push('/home')
     };
 
     const handleRegister = () => {
 
     }
 
-    function handleError(error: any) {
-        console.log('handle error : ' + error);
 
-        return Promise.reject(error & error.message);
-    }
-
-    function handleResponse(response: any): Promise<{ token: string }> {
-        return new Promise(((resolve, reject) => {
-            if (response.ok) {
-                console.log('success')
-                dispatch({
-                    type: 'loginSuccess',
-                    payload: 'Login Successfully'
-                });
-                let contentType = response.headers.get("content-type");
-                if (contentType && contentType.includes("application/json")) {
-                    response.json().then((json: { token: string }) => resolve(json))
-                } else {
-                    resolve()
-                }
-            } else {
-                response.text().then((text: any) => reject(text))
-                console.log('failed')
-                dispatch({
-                    type: 'loginFailed',
-                    payload: 'Login failed'
-                })
-            }
-        }))
-    }
 
     const handleKeyPress = (event: React.KeyboardEvent) => {
         if (event.keyCode === 13 || event.which === 13) {
