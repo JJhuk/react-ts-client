@@ -46,11 +46,17 @@ export default class Home extends React.Component<any, any> {
         const {userName, email} = this.state;
         return (
             <div>
-                <h1 className="user-username">Hi! {userName}</h1>
-                <h4 className="user-email">Your Email is {email}</h4>
-                <h2 className={"weatherInfo"}><WeatherInfo/></h2>
-                <button onClick={this.handleGoHome} className={"user-homeBtn"}>Go to Home</button>
-                <button onClick={this.handleLogout} className={"user-logoutBtn"}>Logout</button>
+                <div>
+                    <h1 className="user-username">Hi! {userName}</h1>
+                    <h4 className="user-email">Your Email is {email}</h4>
+                </div>
+                <div>
+                    <h4 className={"weatherInfo"}><WeatherInfo/></h4>
+                </div>
+                <div>
+                    <button onClick={this.handleGoHome} className={"user-homeBtn"}>Go to Home</button>
+                    <button onClick={this.handleLogout} className={"user-logoutBtn"}>Logout</button>
+                </div>
             </div>
         )
     }
