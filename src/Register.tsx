@@ -59,11 +59,6 @@ function handleResponse(response : any) : Promise<{token : string}> {
     }))
 }
 
-function handleError({error}: { error: any } ) {
-    console.log(error)
-    return Promise.reject(error & error.message);
-}
-
 class Register extends React.Component<WithStyles<typeof styles>,{user}> {
 
     constructor(props : any) {
@@ -127,7 +122,7 @@ class Register extends React.Component<WithStyles<typeof styles>,{user}> {
         };
         console.log(serverURL + '/users/register' + requestOptions);
         fetch(serverURL + '/users/register', requestOptions)
-            .then(handleResponse,handleError)
+            .then(handleResponse)
     }
 
 

@@ -129,7 +129,7 @@ const Login = () => {
                 },
                 body: JSON.stringify({username, password})
             })
-
+        console.log(JSON.stringify({username,password}))
         if (!res.ok) {
             dispatch({
                 type: 'loginFailed',
