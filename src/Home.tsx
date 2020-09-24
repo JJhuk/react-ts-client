@@ -18,14 +18,19 @@ export default class Home extends React.Component<any, any> {
 
         this.getUserData().catch(console.log)
         this.handleLogout = this.handleLogout.bind(this)
+        this.deleteUserData = this.deleteUserData.bind(this)
+    }
+
+    async fetchData(method : string) : Promise<Response> {
+        return fetch(`${config.apiUrl}/users/${this.state.userID}`, {
+            method: 'GET',
+            headers: authHeader(),
+        });
     }
 
     async getUserData() {
         console.log('function fetchData() called ')
-        const response = await fetch(`${config.apiUrl}/users/${this.state.userID}`, {
-            method: 'GET',
-            headers: authHeader(),
-        })
+        const response = await this.fetchData('GET');
         if (!response.ok)
             throw await response.text()
 
@@ -35,6 +40,11 @@ export default class Home extends React.Component<any, any> {
             ...user,
             userID: this.state.userID,
         })
+    }
+
+    async deleteUserData() {
+        console.log('function deleteUserData() called')
+        await this.fetchData('DELETE');
     }
 
     handleGoHome() {
@@ -77,8 +87,18 @@ export default class Home extends React.Component<any, any> {
                     <button onClick={this.handleGoHome} className={"user-homeBtn"}>Go to Home</button>
                     <button onClick={this.handleLogout} className={"user-logoutBtn"}>Logout</button>
                     <button onClick={this.handleUsernameChange}>go to change Username</button>
+                    <button onClick={this.handleDeleteAccount}>delete account</button>
                 </div>
             </div>
         )
+    }
+
+    handleDeleteAccount() {
+        let bIsConfirm: boolean;
+        bIsConfirm = window.confirm("정말 아이디를 삭제하시겠어요?");
+        if(bIsConfirm) {
+            history.goBack()
+            this.deleteUserData().then(r => console.log(r));
+        }
     }
 }
