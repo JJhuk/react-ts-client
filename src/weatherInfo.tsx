@@ -20,16 +20,20 @@ export default class WeatherInfo extends React.Component<any, any> {
             }
         }
 
-        const apiKey ='268ce708189cffd8d95c4ee5cd7d086e'
+            this.fetchWeather().then(r => console.log(r));
+    }
 
-        fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${this.state.curPos.latitude}&lon=${this.state.curPos.longitude}&APPID=${apiKey}`)
+    async fetchWeather() {
+        const apiKey = '268ce708189cffd8d95c4ee5cd7d086e'
+
+        await fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${this.state.curPos.latitude}&lon=${this.state.curPos.longitude}&APPID=${apiKey}`)
             .then(response => response.json())
             .then(json => {
                 console.log(json)
                 this.setState({
-                    name : json.name,
-                    description : json.weather[0].description,
-                    temp : json.main.temp
+                    name: json.name,
+                    description: json.weather[0].description,
+                    temp: json.main.temp
                 })
             })
     }

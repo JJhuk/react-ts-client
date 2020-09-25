@@ -18,19 +18,20 @@ export default class Home extends React.Component<any, any> {
 
         this.getUserData().catch(console.log)
         this.handleLogout = this.handleLogout.bind(this)
-        this.deleteUserData = this.deleteUserData.bind(this)
+        this.handleDeleteAccount = this.handleDeleteAccount.bind(this)
     }
 
-    async fetchData(method : string) : Promise<Response> {
+    async fetchData(method: string): Promise<Response> {
         return fetch(`${config.apiUrl}/users/${this.state.userID}`, {
-            method: 'GET',
+            method: method,
             headers: authHeader(),
         });
     }
 
     async getUserData() {
         console.log('function fetchData() called ')
-        const response = await this.fetchData('GET');
+        const response = await this
+            .fetchData('GET');
         if (!response.ok)
             throw await response.text()
 
@@ -42,9 +43,10 @@ export default class Home extends React.Component<any, any> {
         })
     }
 
-    async deleteUserData() {
+    deleteUserData() {
         console.log('function deleteUserData() called')
-        await this.fetchData('DELETE');
+        this.fetchData('DELETE')
+            .then(r => console.log(r));
     }
 
     handleGoHome() {
@@ -65,10 +67,13 @@ export default class Home extends React.Component<any, any> {
         history.push("changeUserName")
     }
 
-    onChangeUsername = (event) => {
-        this.setState({
-            changeUsername: event.target.value
-        })
+    handleDeleteAccount() {
+        let bIsConfirm: boolean;
+        bIsConfirm = window.confirm("정말 아이디를 삭제하시겠어요?");
+        if (bIsConfirm) {
+            this.deleteUserData()
+            history.goBack()
+        }
     }
 
     render() {
@@ -91,14 +96,5 @@ export default class Home extends React.Component<any, any> {
                 </div>
             </div>
         )
-    }
-
-    handleDeleteAccount() {
-        let bIsConfirm: boolean;
-        bIsConfirm = window.confirm("정말 아이디를 삭제하시겠어요?");
-        if(bIsConfirm) {
-            history.goBack()
-            this.deleteUserData().then(r => console.log(r));
-        }
     }
 }
