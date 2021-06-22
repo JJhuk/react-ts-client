@@ -1,4 +1,4 @@
-import data from '../secrets/credentials.json'
+import data from './secrets/credentials.json'
 
 export const config = {
     apiUrl: 'http://localhost:5000',

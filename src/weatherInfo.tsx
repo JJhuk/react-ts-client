@@ -1,5 +1,5 @@
 import React from "react";
-import data from '../secrets/credentials.json'
+import data from './secrets/credentials.json'
 
 export default class WeatherInfo extends React.Component<any, any> {
 
