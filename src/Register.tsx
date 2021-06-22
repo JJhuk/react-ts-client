@@ -48,9 +48,11 @@ function handleResponse(response : any) : Promise<{token : string}> {
         if(response.ok) {
             let contentType = response.headers.get("content-type");
             if(contentType && contentType.includes("application/json")) {
-                response.json().then(json => resolve(json))
+                response
+                    .json()
+                    .then(json => resolve(json))
             } else{
-                resolve()
+                resolve({token : ""})
             }
         } else {
             console.log('not ok')
